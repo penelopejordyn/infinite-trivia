@@ -13,7 +13,7 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
-  email     String   
+  email     String   @unique
   name      String?
   createdAt DateTime @default(now())
   stats     Stats?
@@ -24,6 +24,5 @@ model Stats {
   userId         String @id
   questionsRight Int
   longestGame    Int
-  totalPoints    Int
   user           User   @relation(fields: [userId], references: [id])
 }

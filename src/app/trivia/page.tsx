@@ -2,14 +2,20 @@
 import withAuth from "../components/withAuth";
 import { PrismaClient } from '@prisma/client'
 import { getSession } from '@auth0/nextjs-auth0';
+import getData from "../components/getData";
+import Advanced from "../components/cards";
+import './page.css'
 
 
- function Home() {
 
+ function Page() {
     return (
-      <h1>test</h1>
-    )
+      <div className='app'>
+        <Advanced />
+      </div>
+    
+  )
  }   
 
 
-export default (Home);
+export default withAuth (Page);

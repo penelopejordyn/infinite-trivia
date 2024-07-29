@@ -30,8 +30,14 @@ export default async function RootLayout({
             <li><a href="/">Home</a></li>
             {user!== null ? (
               <>
-              <li><a href="/api/auth/me">profile</a></li>
+              <li><a href="/users/me">profile</a></li>
               <li><a href="/api/auth/logout">Logout</a></li>
+              <li>
+                <div>
+                 <img src={user.picture} alt={user.name} />
+                 <h2>Hi {user.name}</h2>
+                 </div>
+              </li>
               </>
             ) : (
               <li><a href="/api/auth/login">Login To Play!</a></li>
