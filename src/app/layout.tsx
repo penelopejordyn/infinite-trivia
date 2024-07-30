@@ -35,7 +35,7 @@ export default async function RootLayout({
               <li>
                 <div>
                  <img src={user.picture} alt={user.name} />
-                 <h2>Hi {user.name}</h2>
+                 <p>Hi {user.name}</p>
                  </div>
               </li>
               </>

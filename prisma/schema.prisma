@@ -23,6 +23,7 @@ model User {
 model Stats {
   userId         String @id
   questionsRight Int
+  questionsWrong Int
   longestGame    Int
   user           User   @relation(fields: [userId], references: [id])
 }

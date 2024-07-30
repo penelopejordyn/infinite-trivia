@@ -3,7 +3,9 @@ import { PrismaClient } from '@prisma/client';
 
 export default async function Page() {
   const prisma = new PrismaClient();
-  const { user } = await getSession();
+
+  const session = await getSession();
+  const user = session?.user || null;
 
   async function checkIfEmailExists(email) {
     const existingUser = await prisma.user.findUnique({
@@ -27,6 +29,9 @@ export default async function Page() {
   }
 
   return (
-   <h1>this is the home page</h1>
+    <>
+    <h1>this is the home page</h1>
+    <a className="fakeButton" href="/trivia">Play Now!</a>
+    </>
   );
 }

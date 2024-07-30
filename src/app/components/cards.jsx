@@ -1,6 +1,8 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import TinderCard from 'react-tinder-card';
-import getData from './getData'; // Ensure the path is correct for getData
+import getData from './getData'; 
+import Timer from './Timer';
+import { PrismaClient } from '@prisma/client';
 
 function Advanced() {
   const [db, setDb] = useState([]);
@@ -9,7 +11,9 @@ function Advanced() {
   const [feedback, setFeedback] = useState('');
   const [showFeedback, setShowFeedback] = useState(false);
   const [currentAnswers, setCurrentAnswers] = useState([]);
+  const [gameOver, setGameOver] = useState(false);
   const currentIndexRef = useRef(currentIndex);
+  const answerHandlerRef = useRef();
 
   function decodeHtml(html) {
     const txt = document.createElement('textarea');
@@ -53,16 +57,15 @@ function Advanced() {
     currentIndexRef.current = val;
   };
 
-  const canGoBack = currentIndex < db.length - 1;
-  const canSwipe = currentIndex >= 0;
+  const canSwipe = currentIndex >= 0 && !gameOver;
 
   const swiped = (direction, index) => {
     const currentQuestion = db[index];
     const directionToIndex = {
-      'left': 1,
-      'right': 3,
+      'left': 0,
+      'right': 1,
       'up': 2,
-      'down': 0
+      'down': 3
     };
     
     const selectedAnswerIndex = directionToIndex[direction];
@@ -75,6 +78,11 @@ function Advanced() {
     setFeedback(isCorrect ? 'Correct!' : 'Incorrect!');
     setShowFeedback(true);
     setTimeout(() => setShowFeedback(false), 2000); // Hide feedback after 2 seconds
+
+    if (answerHandlerRef.current) {
+      answerHandlerRef.current(isCorrect);
+    }
+
     updateCurrentIndex(index - 1);
   };
 
@@ -91,12 +99,16 @@ function Advanced() {
     }
   };
 
-  const goBack = async () => {
-    if (!canGoBack) return;
-    const newIndex = currentIndex + 1;
-    updateCurrentIndex(newIndex);
-    await childRefs[newIndex].current.restoreCard();
+
+  const handleTimeUp = ({ gameDuration, correctAnswers, incorrectAnswers }) => {
+    setGameOver(true);
+
+    console.log(`Game Over! Duration: ${gameDuration}s, Correct: ${correctAnswers}, Incorrect: ${incorrectAnswers}`);
   };
+
+  const registerAnswerHandler = useCallback((handler) => {
+    answerHandlerRef.current = handler;
+  }, []);
 
   return (
     <div className="app">
@@ -108,43 +120,47 @@ function Advanced() {
         href='https://fonts.googleapis.com/css?family=Alatsi&display=swap'
         rel='stylesheet'
       />
-      <h1>React Tinder Card</h1>
-      <div className='cardContainer'>
-        {db.map((character, index) => (
-          <TinderCard
-            ref={childRefs[index]}
-            className='swipe'
-            key={character.question}
-            onSwipe={(dir) => swiped(dir, index)}
-            onCardLeftScreen={() => outOfFrame(character.question, index)}
-          >
-            <div className='card'>
-              <h3>{decodeHtml(character.difficulty)}</h3>
-              <h2>{decodeHtml(character.question)}</h2>
+      {!gameOver ? (
+        <>
+          <div className='cardContainer'>
+            {db.map((character, index) => (
+              <TinderCard
+                ref={childRefs[index]}
+                className='swipe'
+                key={character.question}
+                onSwipe={(dir) => swiped(dir, index)}
+                onCardLeftScreen={() => outOfFrame(character.question, index)}
+              >
+                <div className='card'>
+                  <h3>{decodeHtml(character.difficulty)}</h3>
+                  <h2>{decodeHtml(character.question)}</h2>
+                </div>
+              </TinderCard>
+            ))}
+          </div>
+          {db.length > 0 && (
+            <div className='answers'>
+              <div className="answer answer-0">{decodeHtml(currentAnswers[0])}</div>
+              <div className="answer answer-1">{decodeHtml(currentAnswers[1])}</div>
+              <div className="answer answer-2">{decodeHtml(currentAnswers[2])}</div>
+              <div className="answer answer-3">{decodeHtml(currentAnswers[3])}</div>
             </div>
-          </TinderCard>
-        ))}
-      </div>
-      {db.length > 0 && (
-        <div className='answers'>
-          {currentAnswers.map((answer, idx) => (
-            <div
-              key={idx}
-              className={`answer answer-${idx}`}
-              style={{ display: 'block' }}
-            >
-              {decodeHtml(answer)}
-            </div>
-          ))}
+          )}
+          {showFeedback && <div className="feedback">{feedback}</div>}
+          <div className="buttons">
+            <button onClick={() => swipe('left')}>Swipe Left</button>
+            <button onClick={() => swipe('right')}>Swipe Right</button>
+            <button onClick={() => swipe('up')}>Swipe Up</button>
+            <button onClick={() => swipe('down')}>Swipe Down</button>
+          </div>
+          <Timer onTimeUp={handleTimeUp} onAnswer={registerAnswerHandler} />
+        </>
+      ) : (
+        <div className="gameOver">
+          <h2>Game Over!</h2>
+          <a className="fakeButton" href="/trivia">Play Again</a>
         </div>
       )}
-      {showFeedback && <div className="feedback">{feedback}</div>}
-      <div className="buttons">
-        <button onClick={() => swipe('left')}>Swipe Left</button>
-        <button onClick={() => swipe('right')}>Swipe Right</button>
-        <button onClick={() => swipe('up')}>Swipe Up</button>
-        <button onClick={() => swipe('down')}>Swipe Down</button>
-      </div>
     </div>
   );
 }
