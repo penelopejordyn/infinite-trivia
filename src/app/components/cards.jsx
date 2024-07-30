@@ -1,10 +1,9 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import TinderCard from 'react-tinder-card';
-import getData from './getData'; 
-import Timer from './Timer';
-import { PrismaClient } from '@prisma/client';
+import getData from './getData'; // Ensure the path is correct for getData
+import Timer from './Timer'; // Ensure the path is correct for Timer
 
-function Advanced() {
+function Advanced({ userId }) { // Accept userId as a prop
   const [db, setDb] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lastDirection, setLastDirection] = useState();
@@ -23,13 +22,17 @@ function Advanced() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await getData('https://opentdb.com/api.php?amount=50');
-      const formattedData = res.results.map((question) => {
-        const answers = shuffleArray([...question.incorrect_answers, question.correct_answer]);
-        return { ...question, answers };
-      });
-      setDb(formattedData);
-      setCurrentIndex(formattedData.length - 1);
+      try {
+        const res = await getData('https://opentdb.com/api.php?amount=50');
+        const formattedData = res.results.map((question) => {
+          const answers = shuffleArray([...question.incorrect_answers, question.correct_answer]);
+          return { ...question, answers };
+        });
+        setDb(formattedData);
+        setCurrentIndex(formattedData.length - 1);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
     fetchData();
   }, []);
@@ -57,6 +60,7 @@ function Advanced() {
     currentIndexRef.current = val;
   };
 
+  const canGoBack = currentIndex < db.length - 1;
   const canSwipe = currentIndex >= 0 && !gameOver;
 
   const swiped = (direction, index) => {
@@ -99,10 +103,15 @@ function Advanced() {
     }
   };
 
+  const goBack = async () => {
+    if (!canGoBack) return;
+    const newIndex = currentIndex + 1;
+    updateCurrentIndex(newIndex);
+    await childRefs[newIndex].current.restoreCard();
+  };
 
   const handleTimeUp = ({ gameDuration, correctAnswers, incorrectAnswers }) => {
     setGameOver(true);
-
     console.log(`Game Over! Duration: ${gameDuration}s, Correct: ${correctAnswers}, Incorrect: ${incorrectAnswers}`);
   };
 
@@ -120,6 +129,7 @@ function Advanced() {
         href='https://fonts.googleapis.com/css?family=Alatsi&display=swap'
         rel='stylesheet'
       />
+      <h1>React Tinder Card</h1>
       {!gameOver ? (
         <>
           <div className='cardContainer'>
@@ -153,12 +163,11 @@ function Advanced() {
             <button onClick={() => swipe('up')}>Swipe Up</button>
             <button onClick={() => swipe('down')}>Swipe Down</button>
           </div>
-          <Timer onTimeUp={handleTimeUp} onAnswer={registerAnswerHandler} />
+          <Timer userId={userId} onTimeUp={handleTimeUp} onAnswer={registerAnswerHandler} />
         </>
       ) : (
         <div className="gameOver">
           <h2>Game Over!</h2>
-          <a className="fakeButton" href="/trivia">Play Again</a>
         </div>
       )}
     </div>

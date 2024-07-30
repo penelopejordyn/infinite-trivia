@@ -22,8 +22,8 @@ model User {
 
 model Stats {
   userId         String @id
-  questionsRight Int
-  questionsWrong Int
-  longestGame    Int
+  questionsRight Int @default(0)
+  questionsWrong Int @default(0)
+  longestGame    Int @default(0)
   user           User   @relation(fields: [userId], references: [id])
 }

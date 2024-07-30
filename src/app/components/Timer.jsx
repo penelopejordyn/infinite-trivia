@@ -19,13 +19,13 @@ function Timer({ onTimeUp, onAnswer }) {
   useEffect(() => {
     if (time <= 0) {
       clearInterval(intervalRef.current);
-      onTimeUp({ gameDuration, correctAnswers, incorrectAnswers });
+      handleTimeUp();
     }
-  }, [time, onTimeUp, gameDuration, correctAnswers, incorrectAnswers]);
+  }, [time]);
 
   const handleAnswer = (isCorrect) => {
     if (isCorrect) {
-      setTime((prevTime) => prevTime + 5);
+      setTime((prevTime) => prevTime + 2);
       setCorrectAnswers((prevCorrect) => prevCorrect + 1);
     } else {
       setTime((prevTime) => prevTime - 5);
@@ -36,6 +36,31 @@ function Timer({ onTimeUp, onAnswer }) {
   useEffect(() => {
     onAnswer(handleAnswer);
   }, [onAnswer]);
+
+  const handleTimeUp = async () => {
+    try {
+      const response = await fetch('/api/update-game-stats', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          correctAnswers: correctAnswers || 0,
+          incorrectAnswers: incorrectAnswers || 0,
+          gameDuration: gameDuration || 0,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update game stats');
+      }
+
+      await response.json();
+    } catch (error) {
+      console.error('Failed to update game stats:', error);
+    }
+    onTimeUp({ gameDuration, correctAnswers, incorrectAnswers });
+  };
 
   return (
     <div className="timer">
