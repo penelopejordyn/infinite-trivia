@@ -33,7 +33,5 @@ export async function updateGameStats(correctAnswers, incorrectAnswers, gameDura
       longestGame: gameDuration || 0,
     },
   });
-
-  console.log(updatedStats);
   return updatedStats;
 }

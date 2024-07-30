@@ -23,7 +23,7 @@ function Advanced({ userId }) { // Accept userId as a prop
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getData('https://opentdb.com/api.php?amount=50');
+        const res = await getData('https://opentdb.com/api.php?amount=10');
         const formattedData = res.results.map((question) => {
           const answers = shuffleArray([...question.incorrect_answers, question.correct_answer]);
           return { ...question, answers };
@@ -129,7 +129,6 @@ function Advanced({ userId }) { // Accept userId as a prop
         href='https://fonts.googleapis.com/css?family=Alatsi&display=swap'
         rel='stylesheet'
       />
-      <h1>React Tinder Card</h1>
       {!gameOver ? (
         <>
           <div className='cardContainer'>
@@ -168,6 +167,7 @@ function Advanced({ userId }) { // Accept userId as a prop
       ) : (
         <div className="gameOver">
           <h2>Game Over!</h2>
+          <a href="/trivia">Play Again</a>
         </div>
       )}
     </div>
