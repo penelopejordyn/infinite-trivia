@@ -23,10 +23,10 @@ function Advanced({ userId }) { // Accept userId as a prop
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getData('https://opentdb.com/api.php?amount=10');
-        const formattedData = res.results.map((question) => {
-          const answers = shuffleArray([...question.incorrect_answers, question.correct_answer]);
-          return { ...question, answers };
+        const res = await getData(' https://the-trivia-api.com/v2/questions');
+        const formattedData = res.map((item) => {
+          const answers = shuffleArray([...item.incorrectAnswers, item.correctAnswer]);
+          return { ...item, answers };
         });
         setDb(formattedData);
         setCurrentIndex(formattedData.length - 1);
@@ -38,7 +38,7 @@ function Advanced({ userId }) { // Accept userId as a prop
   }, []);
 
   useEffect(() => {
-    if (db.length > 0) {
+    if (db.length > 0 && currentIndex >= 0) {
       setCurrentAnswers(db[currentIndex].answers);
     }
   }, [currentIndex, db]);
@@ -66,17 +66,17 @@ function Advanced({ userId }) { // Accept userId as a prop
   const swiped = (direction, index) => {
     const currentQuestion = db[index];
     const directionToIndex = {
-      'left': 0,
-      'right': 1,
+      'left': 1,
+      'right': 3,
       'up': 2,
-      'down': 3
+      'down': 0
     };
     
     const selectedAnswerIndex = directionToIndex[direction];
     const selectedAnswer = currentAnswers[selectedAnswerIndex];
 
-    const isCorrect = selectedAnswer === currentQuestion.correct_answer;
-    console.log(`Swiped ${direction}: ${selectedAnswer} (Correct: ${currentQuestion.correct_answer})`);
+    const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
+    console.log(`Swiped ${direction}: ${selectedAnswer} (Correct: ${currentQuestion.correctAnswer})`);
 
     setLastDirection(isCorrect ? 'correct' : 'incorrect');
     setFeedback(isCorrect ? 'Correct!' : 'Incorrect!');
@@ -129,6 +129,7 @@ function Advanced({ userId }) { // Accept userId as a prop
         href='https://fonts.googleapis.com/css?family=Alatsi&display=swap'
         rel='stylesheet'
       />
+      <h1>React Tinder Card</h1>
       {!gameOver ? (
         <>
           <div className='cardContainer'>
@@ -136,18 +137,18 @@ function Advanced({ userId }) { // Accept userId as a prop
               <TinderCard
                 ref={childRefs[index]}
                 className='swipe'
-                key={character.question}
+                key={character.id}
                 onSwipe={(dir) => swiped(dir, index)}
-                onCardLeftScreen={() => outOfFrame(character.question, index)}
+                onCardLeftScreen={() => outOfFrame(character.question.text, index)}
               >
                 <div className='card'>
                   <h3>{decodeHtml(character.difficulty)}</h3>
-                  <h2>{decodeHtml(character.question)}</h2>
+                  <h2>{decodeHtml(character.question.text)}</h2>
                 </div>
               </TinderCard>
             ))}
           </div>
-          {db.length > 0 && (
+          {db.length > 0 && currentAnswers.length > 0 && (
             <div className='answers'>
               <div className="answer answer-0">{decodeHtml(currentAnswers[0])}</div>
               <div className="answer answer-1">{decodeHtml(currentAnswers[1])}</div>
@@ -167,7 +168,6 @@ function Advanced({ userId }) { // Accept userId as a prop
       ) : (
         <div className="gameOver">
           <h2>Game Over!</h2>
-          <a href="/trivia">Play Again</a>
         </div>
       )}
     </div>

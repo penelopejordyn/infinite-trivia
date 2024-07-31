@@ -19,6 +19,8 @@ export async function updateGameStats(correctAnswers, incorrectAnswers, gameDura
     throw new Error('User not found');
   }
 
+  
+
   const updatedStats = await prisma.stats.upsert({
     where: { userId: puser.id },
     update: {
@@ -34,4 +36,23 @@ export async function updateGameStats(correctAnswers, incorrectAnswers, gameDura
     },
   });
   return updatedStats;
+}
+
+export async function getUserStats(email) {
+  
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { stats: true },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Error fetching user stats:', error);
+    throw error;
+  }
 }

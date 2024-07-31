@@ -11,7 +11,7 @@ import './page.css'
  function Page() {
     return (
       <div className='app'>
-        <Advanced />
+        <Advanced userId={undefined} />
       </div>
     
   )

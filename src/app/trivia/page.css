@@ -100,7 +100,7 @@ h2 {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   text-align: center;
-  display: none; /* Hide by default */
+ /* Hide by default */
 }
 
 .answer-0 {
