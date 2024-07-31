@@ -168,6 +168,7 @@ function Advanced({ userId }) { // Accept userId as a prop
       ) : (
         <div className="gameOver">
           <h2>Game Over!</h2>
+          <a href = "/trivia">Play Again</a>
         </div>
       )}
     </div>
