@@ -20,20 +20,22 @@ function Advanced({ userId }) { // Accept userId as a prop
     return txt.value;
   }
 
+  const fetchData = async () => {
+    try {
+      const res = await getData(' https://the-trivia-api.com/v2/questions');
+      const formattedData = res.map((item) => {
+        const answers = shuffleArray([...item.incorrectAnswers, item.correctAnswer]);
+        return { ...item, answers };
+      });
+      setDb(formattedData);
+      setCurrentIndex(formattedData.length - 1);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await getData(' https://the-trivia-api.com/v2/questions');
-        const formattedData = res.map((item) => {
-          const answers = shuffleArray([...item.incorrectAnswers, item.correctAnswer]);
-          return { ...item, answers };
-        });
-        setDb(formattedData);
-        setCurrentIndex(formattedData.length - 1);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+    
     fetchData();
   }, []);
 
@@ -81,7 +83,7 @@ function Advanced({ userId }) { // Accept userId as a prop
     setLastDirection(isCorrect ? 'correct' : 'incorrect');
     setFeedback(isCorrect ? 'Correct!' : 'Incorrect!');
     setShowFeedback(true);
-    setTimeout(() => setShowFeedback(false), 2000); // Hide feedback after 2 seconds
+    setTimeout(() => setShowFeedback(false), 500); // Hide feedback after 2 seconds
 
     if (answerHandlerRef.current) {
       answerHandlerRef.current(isCorrect);
@@ -95,6 +97,10 @@ function Advanced({ userId }) { // Accept userId as a prop
     if (currentIndexRef.current >= idx) {
       childRefs[idx].current.restoreCard();
     }
+
+if (idx === 0) {
+    fetchData();
+}
   };
 
   const swipe = async (dir) => {
@@ -129,7 +135,6 @@ function Advanced({ userId }) { // Accept userId as a prop
         href='https://fonts.googleapis.com/css?family=Alatsi&display=swap'
         rel='stylesheet'
       />
-      <h1>React Tinder Card</h1>
       {!gameOver ? (
         <>
           <div className='cardContainer'>
@@ -163,7 +168,7 @@ function Advanced({ userId }) { // Accept userId as a prop
             <button onClick={() => swipe('up')}>Swipe Up</button>
             <button onClick={() => swipe('down')}>Swipe Down</button>
           </div>
-          <Timer userId={userId} onTimeUp={handleTimeUp} onAnswer={registerAnswerHandler} />
+          <Timer className="timer" userId={userId} onTimeUp={handleTimeUp} onAnswer={registerAnswerHandler} />
         </>
       ) : (
         <div className="gameOver">

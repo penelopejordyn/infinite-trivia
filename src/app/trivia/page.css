@@ -20,7 +20,7 @@
 }
 
 .app {
-  overflow: hidden;
+  position: relative;
 }
 
 .app>div {
@@ -43,12 +43,14 @@ h1 {
   color: #fff;
 }
 
-h2 {
+.timer {
+  position:absolute;
   font-size: 2vw; /* Adjust as needed */
   overflow: hidden;
   text-overflow: ellipsis;
   width: 100%;
   text-align: center;
+  bottom: 200px
 }
 
 .swipe {
@@ -70,7 +72,14 @@ h2 {
   border-radius: 20px;
   background-size: cover;
   background-position: center;
+  top: 110px
 }
+
+.card h2 {
+  font-size: 2vw;
+  overflow: hidden;
+  text-align: center;
+ }
 
 .cardContent {
   width: 100%;
@@ -78,22 +87,26 @@ h2 {
 }
 
 .card h3 {
-  position: absolute;
-  bottom: 50px;
-  right: 45%;
+  bottom: 0%;
+  text-align: center;
   color: #fff;
 }
 
 .answers {
-  display: flex;
+  display: absolute;
   flex-wrap: wrap;
-  justify-content: space-around;
-  width: 100%;
+  top:50px;
+}
+
+.feedback {
+  position: absolute;
+  top: 408px
 }
 
 .answer {
   position: absolute;
-  width: 100px;
+  max-width: 300px;
+  max-height: 68px;
   padding: 10px;
   border-radius: 10px;
   background-color: #373b4c;
@@ -104,26 +117,30 @@ h2 {
 }
 
 .answer-0 {
+  position:fixed;
   top: 92%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
 .answer-1 {
+  position:fixed;
   top: 50%;
-  right: 95%;
+  right: 75%;
   transform: translate(50%, -50%);
 }
 
 .answer-2 {
-  bottom: 92%;
+  position:fixed;
+  bottom: 86%;
   left: 50%;
   transform: translate(-50%, 50%);
 }
 
 .answer-3 {
+  position:fixed;
   top: 50%;
-  left: 95%;
+  left: 75%;
   transform: translate(-50%, -50%);
 }
 
@@ -138,15 +155,15 @@ h2 {
 
 .buttons {
   margin: 20px;
-  display: flex;
-  flex-wrap: wrap;
+  display: flex !important;
+  flex-direction: row !important;/* Ensure buttons are in a row */
+  justify-content: center !important; /* Center the buttons */
+  flex-wrap: wrap !important; /* Allow buttons to wrap */
+  width: 500px;
+  position:absolute;
+  top: 410px
 }
 
-@media (max-width: 625px) {
-  .buttons {
-    flex-direction: column;
-  }
-}
 
 .buttons button {
   flex-shrink: 0;

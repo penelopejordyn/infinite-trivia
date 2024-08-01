@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 function Timer({ onTimeUp, onAnswer }) {
-  const [time, setTime] = useState(30);
+  const [time, setTime] = useState(60);
   const [gameDuration, setGameDuration] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
@@ -25,7 +25,7 @@ function Timer({ onTimeUp, onAnswer }) {
 
   const handleAnswer = (isCorrect) => {
     if (isCorrect) {
-      setTime((prevTime) => prevTime + 2);
+      setTime((prevTime) => prevTime + 5);
       setCorrectAnswers((prevCorrect) => prevCorrect + 1);
     } else {
       setTime((prevTime) => prevTime - 5);
